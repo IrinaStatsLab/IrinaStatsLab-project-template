@@ -1,0 +1,27 @@
+/* Title slide: deep navy-to-teal gradient with white text */
+.reveal .slides section.title-slide,
+.reveal .slides > section:first-child {
+  background: linear-gradient(135deg, #1a2a4a 0%, #1a5276 60%, #148f77 100%);
+  color: #ffffff !important;
+}
+
+.reveal .slides section.title-slide h1,
+.reveal .slides > section:first-child h1 {
+  color: #ffffff !important;
+  font-size: 2em;
+  font-weight: 700;
+  margin-bottom: 0.2em;
+}
+
+.reveal .slides section.title-slide .subtitle,
+.reveal .slides > section:first-child .subtitle,
+.reveal .slides section.title-slide p.subtitle {
+  color: #d5e8f7 !important;
+  font-size: 1.1em;
+  font-style: italic;
+}
+
+/* Subtle top accent bar on all other slides */
+.reveal .slides section:not(:first-child) {
+  border-top: 4px solid #1a5276;
+}

@@ -1,0 +1,272 @@
+---
+title: "IrinaStatsLab Project Template"
+subtitle: "Principles for Reproducible Research"
+format:
+  revealjs:
+    theme: default
+    slide-number: true
+    toc: false
+    css: styles.css
+---
+
+## What This Template Is For
+
+A standard structure for R/RStudio projects in the lab.
+
+- Applies regardless of programming language or environment
+- 🔴 **Core** — do from day one; violations cause immediate, concrete problems
+- 🟡 **Build toward** — important as projects grow; less critical for a first small project
+
+---
+
+## Core Principles at a Glance
+
+::: {.incremental}
+- File paths are relative to the project root
+- Code runs without manual intervention
+- Raw data is never modified
+- All figures and tables are generated automatically by code
+- Results are exactly reproducible
+- Scripts are modular and run in sequence
+- Intermediate outputs are saved
+- Each analytical step is done exactly once
+- Analytical decisions are documented
+- The project is self-contained
+:::
+
+---
+
+## Project Structure
+
+Universal across all project types:
+
+```
+project/
+├── R/          # Reusable functions, sourced by all scripts
+├── output/
+│   ├── figures/
+│   ├── tables/
+│   └── rds/    # Intermediate R objects
+└── README.md
+```
+
+---
+
+## Project Variants
+
+| Variant | Best For |
+|---|---|
+| **Data Analysis** | External dataset; numbered pipeline in `analysis/` |
+| **Methods Development** | Simulations as primary engine; real data optional |
+| **Lightweight** | Exploratory projects; no formal pipeline needed |
+
+---
+
+## 🟡 Version Control
+
+**The project lives under version control.**
+
+- Create under the [IrinaStatsLab](https://github.com/IrinaStatsLab) GitHub org; start as private
+- Make public only when ready to share
+- Do **not** push data unless it is public, small, and you have hosting rights
+- Commit regularly with meaningful messages — not a single end-of-project dump
+- For manuscript submission, archive a permanent snapshot on OSF or Zenodo
+
+> GitHub alone is not a permanent archive.
+
+---
+
+## 🔴 Self-Contained Project
+
+**Everything needed to run the analysis lives within the project.**
+
+| Data type | Approach |
+|---|---|
+| Small public data | Include in the repository |
+| Large public data | Exclude; provide a download script |
+| Confidential data | Exclude; document access requirements |
+
+- README must always state how to obtain the data
+- 🟡 Use `renv` to manage packages; commit `renv.lock`
+- 🟡 Collaborators run `renv::restore()` to recreate the environment
+
+---
+
+## 🔴 Raw Data Is Never Modified
+
+**Source data is read-only; all transformations happen in code.**
+
+- `data/raw/` is only ever **read from** — never written to
+- All cleaned outputs go to `data/processed/` or `output/rds/`
+- Optionally, make `data/raw/` read-only at the OS level as a safeguard
+
+---
+
+## 🟡 Data Validation
+
+**Validate data at each pipeline stage.**
+
+- After loading raw data: check dimensions, column names, and data types
+- After cleaning: check for unexpected missing values, impossible values, and wrong distributions
+- Useful tools: `stopifnot()` for hard assertions; `summary()`, `is.na()`, `table()` for inspection
+- Validation checks belong **in the script** — not only in the analyst's head
+
+---
+
+## 🔴 Relative File Paths
+
+**No hardcoded absolute paths — code must run on any machine.**
+
+- **Preferred:** open the `.Rproj` file; RStudio sets the working directory to the project root automatically
+  ```r
+  read_csv("data/raw/myfile.csv")  # just works
+  ```
+- **Alternative:** `here::here("data", "raw", "myfile.csv")` — useful in Quarto/R Markdown where the working directory may differ
+
+---
+
+## 🔴 Code Runs Without Manual Intervention
+
+**No editing required to run a script.**
+
+- No `setwd()` anywhere in the project
+- No comments instructing someone to change a path or variable
+- No comment-in/comment-out blocks used as switches
+- All `library()` calls go at the **top** of each script — never mid-script
+- One-time setup steps go in `scripts/00_setup.R`
+
+---
+
+## 🟡 Consistent Naming
+
+**Files, functions, and variables follow a predictable convention.**
+
+- `snake_case` for file names, functions, and variables
+- Scripts numbered to make order explicit: `01_clean.R`, `02_model.R`, …
+- Function names are **verbs**: `compute_age_group()`
+- Data objects are **nouns**: `patient_visits`
+
+---
+
+## 🟡 Functions and Scripts Are Separated
+
+**Reusable logic lives in dedicated files; analysis scripts orchestrate.**
+
+- All reusable functions live in `R/`
+- Loaded at the top of any script that needs them:
+  ```r
+  source("R/plot_functions.R")
+  ```
+- Every function documents its inputs, outputs, and assumptions
+- Analysis scripts should read like a sequence of function calls
+
+---
+
+## 🔴 Each Analytical Step Is Done Exactly Once
+
+**Every transformation happens in one place only.**
+
+- Derived variables (age groups, composite scores) are created in `01_clean.R`, saved, and loaded as-is by all downstream scripts
+- If the same plot type is produced for multiple variables, a single function in `R/` handles it
+- Repeated code patterns belong in a function
+
+---
+
+## 🔴 Scripts Are Modular and Run in Sequence
+
+**The analysis is broken into discrete, numbered stages.**
+
+- Scripts in `analysis/` are numbered: `01_clean.R`, `02_model.R`, `03_figures.R`, …
+- Every script opens with a header: purpose, inputs (file paths), outputs (file paths)
+- Any script can be run **independently** — no need to rerun earlier steps
+- A frequently iterated script (e.g., figures) should always be separate from slow upstream steps
+- Optionally, a `run_all.R` at the project root sources all scripts in order
+
+---
+
+## 🔴 Intermediate Outputs Are Saved
+
+**Each stage writes its outputs to disk; the next stage loads them.**
+
+- R objects (model fits, processed data frames):
+  ```r
+  saveRDS(model, "output/rds/model.rds")
+  model <- readRDS("output/rds/model.rds")
+  ```
+- Human-readable outputs: `write_csv()` → `data/processed/` or `output/tables/`
+- If only figures need updating, the figures script reruns on its own — no reprocessing needed
+
+---
+
+## 🟡 Computation and Presentation Are Separated
+
+**Heavy processing runs in dedicated scripts; reports only load outputs.**
+
+- Simulation/modeling scripts save results to `output/rds/`; a separate figures script loads and plots them
+- Quarto/R Markdown reports load pre-computed outputs — they **do not** run the analysis
+- If a report is slow to render, computation belongs in a script, not the document
+
+---
+
+## 🔴 Figures and Tables Are Generated by Code
+
+**No manually edited outputs — everything traces to a script.**
+
+- Never export figures by hand from the RStudio Plots pane
+- Default format: **PDF** (vector-based; accepted by all major journals)
+- Preferred pattern:
+  ```r
+  pdf("output/figures/fig1.pdf", width = 6, height = 4)
+  # plot code
+  dev.off()
+  ```
+- Tables saved with `write_csv()`; LaTeX tables via `kableExtra` or `gt` — never by hand
+- Each figure/table in the manuscript should be traceable to its script and output file
+
+---
+
+## 🔴 Results Are Exactly Reproducible
+
+**Given the same inputs, the pipeline produces identical outputs.**
+
+- `set.seed()` at the top of any script that uses randomness
+- For parallel simulations, use `RNGkind("L'Ecuyer-CMRG")` before setting the seed
+- Do **not** suppress warnings — if genuinely ignorable, document *why* in a comment
+- In RStudio: disable "Restore .RData at startup"; set "Save workspace" to **Never**
+- Before finalizing, run the full pipeline in a **fresh R session**
+- 🟡 `renv` pins package versions
+
+---
+
+## 🔴 Analytical Decisions Are Documented
+
+**Comments explain *why*, not *what*.**
+
+- Comment every meaningful decision: why a variable was recoded, why a model was specified, why observations were excluded
+- When in doubt, add a comment — over-commenting is far less costly than under-commenting
+- For richer documentation, Quarto or R Markdown reports weave code, output, and interpretation together
+
+---
+
+## 🟡 Code Review Before Submission
+
+**No unreviewed code should support a submitted manuscript.**
+
+- Before submission, at least one lab member runs the full pipeline **independently** and verifies outputs match
+- Review should confirm:
+  - Scripts run without error
+  - Figures and tables match the manuscript
+  - No results are hardcoded by hand
+
+---
+
+## Tools for Spotting Issues
+
+| Tool | Purpose |
+|---|---|
+| **AI-assisted review** | First pass: flags hardcoded values, missing comments, suspicious logic |
+| **Peer review** | Most important; a lab member runs the full pipeline independently |
+| `lintr` | Static analysis: style violations, common errors |
+| `styler` | Auto-formats code to a consistent style |
+| **Fresh session test** | Run the full pipeline with no leftover objects in memory |
+| `testthat` | Unit tests for functions in `R/` (especially for methods projects) |
