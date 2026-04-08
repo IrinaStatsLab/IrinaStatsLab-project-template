@@ -1,5 +1,5 @@
 # RStudio project file
-*.Rproj
+# *.Rproj
 
 # R environment and history
 .Rhistory
