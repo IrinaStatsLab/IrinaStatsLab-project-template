@@ -483,16 +483,63 @@ descriptive.</p>
 │   ├── raw/
 │   └── processed/
 ├── R/                     # functions.R, explore.R, model.R, etc.</code></pre>
+<hr />
 </div>
+</div>
+<div id="start-here" class="section level2">
+<h2>Start Here</h2>
+<p>New to the lab? Before reading the full principles below, here is the
+minimum viable checklist for reproducible, shareable work. These
+correspond to the 🔴 <strong>Core</strong> principles — the ones where
+violations cause immediate, concrete problems.</p>
+<ul class="task-list">
+<li><label><input type="checkbox"></input><strong>Open the <code>.Rproj</code>
+file in RStudio</strong> — never navigate directly to a script. This
+sets the working directory to the project root
+automatically.</label></li>
+<li><label><input type="checkbox"></input><strong>Use relative paths
+only</strong> — write <code>&quot;data/raw/file.csv&quot;</code>, never
+<code>/Users/yourname/...</code>. No <code>setwd()</code> anywhere in
+the project.</label></li>
+<li><label><input type="checkbox"></input><strong>Never write to
+<code>data/raw/</code></strong> — treat all raw data as
+read-only.</label></li>
+<li><label><input type="checkbox"></input><strong>Never click Export in the
+RStudio Plots pane</strong> — all figures and tables must be generated
+by code; clicking Export breaks the code-to-output trail
+silently.</label></li>
+<li><label><input type="checkbox"></input><strong>Put
+<code>set.seed()</code></strong> at the top of any script that uses
+randomness.</label></li>
+<li><label><input type="checkbox"></input><strong>Disable workspace
+saving</strong> — one-time RStudio setting: Tools → Global Options →
+General → set “Save workspace to .RData on exit” to
+<strong>Never</strong>; uncheck “Restore .RData into workspace at
+startup”.</label></li>
+<li><label><input type="checkbox"></input><strong>Commit to version control
+regularly</strong> — with meaningful messages, not as a single
+end-of-project dump.</label></li>
+</ul>
+<p>The full Principles section below explains the reasoning behind each
+item and what to build toward as projects grow in size, duration, and
+complexity.</p>
+<hr />
 </div>
 <div id="principles" class="section level2">
 <h2>Principles</h2>
 <p>These principles apply regardless of programming language or
 environment.</p>
-<p><strong>The project lives under version control.</strong> All code,
-configuration, and documentation is tracked in a repository, enabling
-collaboration, rollback, and a record of not just what changed but
-why.</p>
+<p>🔴 <strong>Core</strong> — do this from day one; violations cause
+immediate, concrete problems. 🟡 <strong>Build toward</strong> —
+important as projects grow in size, duration, and complexity; less
+critical for a first small project.</p>
+<p>When specific example implementations within a 🔴 principle require
+more setup or only pay off later, they are marked 🟡 individually.</p>
+<hr />
+<p>🔴 <strong>The project lives under version control.</strong> All
+code, configuration, and documentation is tracked in a repository,
+enabling collaboration, rollback, and a record of not just what changed
+but why.</p>
 <blockquote>
 <p><em>Example implementation (R/RStudio):</em></p>
 <ul>
@@ -503,12 +550,17 @@ organization; start as private</li>
 rights</li>
 <li>Commit regularly with meaningful messages — not as a single
 end-of-project dump</li>
+<li>🟡 For manuscript submission, archive a permanent snapshot of the
+code (and data, if shareable) on <a href="https://osf.io">OSF</a>, <a href="https://zenodo.org">Zenodo</a>, or equivalent — many journals now
+require this, and a GitHub repository alone is not a permanent
+archive</li>
 <li>See the lab’s <a href="https://github.com/IrinaStatsLab/IrinaStatsLabResources">coding
 resources</a> for commit style conventions</li>
 </ul>
 </blockquote>
-<p><strong>The project is self-contained.</strong> Everything needed to
-run the analysis — code, dependency declarations, and data (or
+<hr />
+<p>🔴 <strong>The project is self-contained.</strong> Everything needed
+to run the analysis — code, dependency declarations, and data (or
 instructions to obtain it) — lives within the project.</p>
 <blockquote>
 <p>Data handling varies by project:</p>
@@ -544,16 +596,26 @@ repository</td>
 <blockquote>
 <p><em>Example implementation (R/RStudio):</em></p>
 <ul>
-<li>Use <a href="https://rstudio.github.io/renv/"><code>renv</code></a>
-to manage packages</li>
-<li>Run <code>renv::init()</code> at project setup; commit
+<li>🟡 Use <a href="https://rstudio.github.io/renv/"><code>renv</code></a> to manage
+packages</li>
+<li>🟡 Run <code>renv::init()</code> at project setup; commit
 <code>renv.lock</code></li>
-<li>Collaborators run <code>renv::restore()</code> to recreate the
+<li>🟡 Collaborators run <code>renv::restore()</code> to recreate the
 environment</li>
-<li>Run <code>renv::snapshot()</code> whenever packages change</li>
+<li>🟡 Run <code>renv::snapshot()</code> whenever packages change</li>
 </ul>
 </blockquote>
-<p><strong>Raw data is never modified.</strong> Source data is
+<blockquote>
+<p>⏳ <em>Learning curve:</em> The benefit of <code>renv</code> becomes
+concrete when you return to a project after months away, or when a
+collaborator can’t reproduce your results because they have a different
+package version. For a short solo project, noting
+<code>sessionInfo()</code> output in a script comment is a reasonable
+starting point. Migrate to <code>renv</code> when the project will live
+beyond a few weeks or involve collaborators.</p>
+</blockquote>
+<hr />
+<p>🔴 <strong>Raw data is never modified.</strong> Source data is
 read-only; all transformations happen in code and outputs go to separate
 locations.</p>
 <blockquote>
@@ -567,7 +629,36 @@ to</li>
 a safeguard</li>
 </ul>
 </blockquote>
-<p><strong>File paths are relative to the project root.</strong> No
+<hr />
+<p>🟡 <strong>Data is validated at each pipeline stage.</strong> After
+loading or transforming data, basic checks should be explicit in the
+code — not assumed. Validation catches problems early, before they
+silently propagate through the analysis and surface only in final
+results.</p>
+<blockquote>
+<p><em>Example implementation (R/RStudio):</em></p>
+<ul>
+<li>After loading raw data: check dimensions, column names, and data
+types</li>
+<li>After cleaning: check for unexpected missing values, impossible
+values, and distributions that look wrong</li>
+<li>Useful tools: <code>stopifnot()</code> for hard assertions,
+<code>summary()</code>, <code>is.na()</code>, <code>table()</code> for
+quick inspection</li>
+<li>Validation checks belong in the script itself, not only in the
+analyst’s head</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>⏳ <em>Learning curve:</em> Data problems rarely surface where they
+are introduced — they surface later, when a suspicious result forces you
+to trace backward through the pipeline. Explicit validation makes that
+tracing much faster and often prevents the problem entirely. This pays
+off most in larger pipelines or when working with messy real-world
+data.</p>
+</blockquote>
+<hr />
+<p>🔴 <strong>File paths are relative to the project root.</strong> No
 hardcoded absolute paths — paths should resolve correctly on any machine
 without modification.</p>
 <blockquote>
@@ -583,10 +674,12 @@ differ, but can behave unexpectedly when file names are not unique
 across the project</li>
 </ul>
 </blockquote>
-<p><strong>Code runs without manual intervention.</strong> No one should
-need to edit a line, change a working directory, or follow a “before you
-run this” comment to execute the code. Repeated values belong in a
-function or single configuration location, not copy-pasted inline.</p>
+<hr />
+<p>🔴 <strong>Code runs without manual intervention.</strong> No one
+should need to edit a line, change a working directory, or follow a
+“before you run this” comment to execute the code. Repeated values
+belong in a function or single configuration location, not copy-pasted
+inline.</p>
 <blockquote>
 <p><em>Example implementation (R/RStudio):</em></p>
 <ul>
@@ -595,11 +688,15 @@ function or single configuration location, not copy-pasted inline.</p>
 <li>No comment-in/comment-out blocks used as switches — if a step is
 conditional or optional, control it with a parameter or a separate
 script, not by manually uncommenting lines</li>
+<li>All <code>library()</code> calls go at the top of the script — never
+mid-script; this makes dependencies immediately visible to anyone
+reading the code</li>
 <li>One-time setup steps (dependency installation, configuration) go in
 <code>scripts/00_setup.R</code></li>
 </ul>
 </blockquote>
-<p><strong>Naming is consistent and intentional.</strong> Files,
+<hr />
+<p>🔴 <strong>Naming is consistent and intentional.</strong> Files,
 functions, and variables follow a predictable convention; good names
 communicate purpose without requiring a comment.</p>
 <blockquote>
@@ -612,10 +709,12 @@ communicate purpose without requiring a comment.</p>
 objects are nouns: <code>patient_visits</code></li>
 </ul>
 </blockquote>
-<p><strong>Functions and scripts are separated.</strong> Reusable logic
-lives in dedicated files; analysis scripts orchestrate, they do not
-define. Every function must document its inputs and outputs explicitly —
-not as an afterthought, but as part of writing the function.</p>
+<hr />
+<p>🟡 <strong>Functions and scripts are separated.</strong> Reusable
+logic lives in dedicated files; analysis scripts orchestrate, they do
+not define. Every function must document its inputs and outputs
+explicitly — not as an afterthought, but as part of writing the
+function.</p>
 <blockquote>
 <p><em>Example implementation (R/RStudio):</em></p>
 <ul>
@@ -628,7 +727,15 @@ what it returns, and any important assumptions or side effects</li>
 implementation details out of sight</li>
 </ul>
 </blockquote>
-<p><strong>Each analytical step is done exactly once.</strong> Every
+<blockquote>
+<p>⏳ <em>Learning curve:</em> The payoff is subtle on a first project
+but compounds quickly. Once you are producing the same plot type for 10
+variables, or once a bug in shared logic needs fixing in five places at
+once, the value is obvious. The habit is easier to build early than to
+retrofit later.</p>
+</blockquote>
+<hr />
+<p>🟡 <strong>Each analytical step is done exactly once.</strong> Every
 transformation or derivation happens in one place only; downstream
 scripts consume the output, they do not repeat the logic. Repeated code
 patterns belong in a function.</p>
@@ -642,7 +749,15 @@ scripts</li>
 function in <code>R/</code> handles it</li>
 </ul>
 </blockquote>
-<p><strong>Scripts are modular and run in sequence.</strong> The
+<blockquote>
+<p>⏳ <em>Learning curve:</em> Like functions/scripts separation, this
+becomes most visible when something needs to change — a recoding
+decision, a model specification — and you realize the logic has been
+copy-pasted into four different scripts. Fixing it once is easy; fixing
+it in four places consistently is error-prone.</p>
+</blockquote>
+<hr />
+<p>🔴 <strong>Scripts are modular and run in sequence.</strong> The
 analysis is broken into discrete, numbered stages; each stage reads its
 inputs and writes its outputs explicitly. The guiding question for where
 to split: <em>could you imagine wanting to rerun this step without
@@ -657,6 +772,9 @@ split depends on the project.</p>
 <li>Scripts in <code>analysis/</code> are numbered:
 <code>01_clean.R</code>, <code>02_model.R</code>,
 <code>03_figures.R</code>, …</li>
+<li>Every script opens with a short header comment stating its purpose,
+its inputs (file paths), and its outputs (file paths) — this makes the
+pipeline readable without running anything</li>
 <li>Each script saves its outputs so the next can load them fresh</li>
 <li>Any script can be run independently — no need to rerun earlier
 steps</li>
@@ -666,7 +784,8 @@ always be separate from slow upstream steps</li>
 scripts in order</li>
 </ul>
 </blockquote>
-<p><strong>Intermediate outputs are saved.</strong> Each stage writes
+<hr />
+<p>🟡 <strong>Intermediate outputs are saved.</strong> Each stage writes
 its outputs to disk; the next stage loads them. This avoids re-running
 expensive steps and makes each stage independently inspectable.</p>
 <blockquote>
@@ -682,7 +801,14 @@ expensive steps and makes each stage independently inspectable.</p>
 — no data reprocessing needed</li>
 </ul>
 </blockquote>
-<p><strong>Computation and presentation are separated.</strong> Heavy
+<blockquote>
+<p>⏳ <em>Learning curve:</em> The first time you wait 20 minutes for a
+simulation or model to rerun just to tweak a figure label, this
+principle becomes self-evident. For fast pipelines it adds little; for
+anything computationally expensive it is essential.</p>
+</blockquote>
+<hr />
+<p>🟡 <strong>Computation and presentation are separated.</strong> Heavy
 processing — data cleaning, model fitting, simulations — runs in
 dedicated scripts and saves its outputs. Downstream scripts load those
 outputs and focus solely on presentation. This keeps slow steps from
@@ -700,7 +826,15 @@ the analysis</li>
 belongs in a script, not the document</li>
 </ul>
 </blockquote>
-<p><strong>All figures and tables are generated automatically by
+<blockquote>
+<p>⏳ <em>Learning curve:</em> The value is proportional to how slow
+your upstream steps are. Also important for Quarto/RMarkdown reports: a
+document that re-runs a full model every time it renders is fragile and
+slow. This naturally follows from saving intermediate outputs — once
+those are in place, keeping them out of reports is straightforward.</p>
+</blockquote>
+<hr />
+<p>🔴 <strong>All figures and tables are generated automatically by
 code.</strong> No manually edited outputs; if something needs to change,
 it changes in the code. Every figure and table in a manuscript or report
 must trace directly to a specific script and output file — this mapping
@@ -729,7 +863,8 @@ script and output file (e.g., noted in comments or in the README
 pipeline table)</li>
 </ul>
 </blockquote>
-<p><strong>Results are exactly reproducible.</strong> Given the same
+<hr />
+<p>🔴 <strong>Results are exactly reproducible.</strong> Given the same
 inputs, the pipeline produces identical outputs — this requires pinned
 packages, explicit seeds, and no hidden environment state. Running from
 a fresh session is the default, not the exception.</p>
@@ -738,10 +873,17 @@ a fresh session is the default, not the exception.</p>
 <ul>
 <li><code>set.seed()</code> at the top of any script that uses
 randomness</li>
-<li><code>renv</code> pins package versions (see self-contained note
+<li>For parallel simulation runs, <code>set.seed()</code> alone is not
+sufficient — use <code>RNGkind(&quot;L&#39;Ecuyer-CMRG&quot;)</code> before setting
+the seed to ensure reproducibility across workers</li>
+<li>🟡 <code>renv</code> pins package versions (see self-contained note
 above)</li>
-<li><code>renv::snapshot()</code> keeps <code>renv.lock</code> current
-as packages change</li>
+<li>🟡 <code>renv::snapshot()</code> keeps <code>renv.lock</code>
+current as packages change</li>
+<li>Do not suppress warnings with <code>suppressWarnings()</code> or
+<code>suppressMessages()</code> — warnings often indicate real problems;
+if a warning is genuinely ignorable, document why in a comment rather
+than silencing it</li>
 <li>In RStudio, disable “Restore .RData into workspace at startup” and
 set “Save workspace to .RData on exit” to <strong>Never</strong> (Tools
 → Global Options → General) — the environment should always be rebuilt
@@ -750,7 +892,8 @@ from code, never carried over from a previous session</li>
 it works without leftover objects</li>
 </ul>
 </blockquote>
-<p><strong>Analytical decisions are documented.</strong> Comment
+<hr />
+<p>🔴 <strong>Analytical decisions are documented.</strong> Comment
 generously. Comments explain <em>why</em>, not <em>what</em> — but there
 should be many of them. Non-obvious choices in cleaning, modeling, or
 interpretation are noted where they occur. A collaborator or reviewer
@@ -768,7 +911,8 @@ than under-commenting</li>
 output, and written interpretation together</li>
 </ul>
 </blockquote>
-<p><strong>Code is reviewed before submission.</strong> No code
+<hr />
+<p>🟡 <strong>Code is reviewed before submission.</strong> No code
 supporting a submitted manuscript, report, or public release should be
 unreviewed. A second set of eyes catches errors — including
 non-reproducible outputs and incorrect logic — that the original author
@@ -781,6 +925,14 @@ independently and verifies outputs match the manuscript</li>
 <li>Review should confirm: scripts run without error, figures and tables
 match the manuscript, no results are hardcoded by hand</li>
 </ul>
+</blockquote>
+<blockquote>
+<p>⏳ <em>Learning curve:</em> This is a lab workflow practice, not an
+individual habit — it requires coordination and time. Build toward it as
+a norm: before any manuscript submission or public release, at least one
+other person should run the full pipeline independently. The habit is
+easier to establish at the start of a project than to introduce at the
+submission deadline.</p>
 </blockquote>
 <hr />
 </div>

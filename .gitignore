@@ -11,3 +11,4 @@ renv/library/
 
 # OS files
 .DS_Store
+.positai
