@@ -1,0 +1,13 @@
+# RStudio project file
+*.Rproj
+
+# R environment and history
+.Rhistory
+.RData
+.Rproj.user/
+
+# renv library (dependencies declared in renv.lock, not the library itself)
+renv/library/
+
+# OS files
+.DS_Store
