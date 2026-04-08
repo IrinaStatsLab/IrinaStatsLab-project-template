@@ -488,41 +488,47 @@ descriptive.</p>
 </div>
 <div id="start-here" class="section level2">
 <h2>Start Here</h2>
-<p>New to the lab? Before reading the full principles below, here is the
-minimum viable checklist for reproducible, shareable work. These
-correspond to the 🔴 <strong>Core</strong> principles — the ones where
-violations cause immediate, concrete problems.</p>
+<p>New to the lab? The 🔴 <strong>Core</strong> principles are the ones
+that cause immediate, concrete problems if ignored. Here they are as
+brief statements — find each one in the Principles section below for
+reasoning and R/RStudio implementation details.</p>
 <ul class="task-list">
-<li><label><input type="checkbox"></input><strong>Open the <code>.Rproj</code>
-file in RStudio</strong> — never navigate directly to a script. This
-sets the working directory to the project root
-automatically.</label></li>
-<li><label><input type="checkbox"></input><strong>Use relative paths
-only</strong> — write <code>&quot;data/raw/file.csv&quot;</code>, never
-<code>/Users/yourname/...</code>. No <code>setwd()</code> anywhere in
-the project.</label></li>
-<li><label><input type="checkbox"></input><strong>Never write to
-<code>data/raw/</code></strong> — treat all raw data as
-read-only.</label></li>
-<li><label><input type="checkbox"></input><strong>Never click Export in the
-RStudio Plots pane</strong> — all figures and tables must be generated
-by code; clicking Export breaks the code-to-output trail
-silently.</label></li>
-<li><label><input type="checkbox"></input><strong>Put
-<code>set.seed()</code></strong> at the top of any script that uses
-randomness.</label></li>
-<li><label><input type="checkbox"></input><strong>Disable workspace
-saving</strong> — one-time RStudio setting: Tools → Global Options →
-General → set “Save workspace to .RData on exit” to
-<strong>Never</strong>; uncheck “Restore .RData into workspace at
-startup”.</label></li>
-<li><label><input type="checkbox"></input><strong>Commit to version control
-regularly</strong> — with meaningful messages, not as a single
-end-of-project dump.</label></li>
+<li><label><input type="checkbox"></input><strong>File paths are relative to
+the project root.</strong> Code must run unchanged on any
+machine.</label></li>
+<li><label><input type="checkbox"></input><strong>Code runs without manual
+intervention.</strong> No editing required to run a script — no path
+changes, no instructions-as-comments, no comment-in/comment-out
+switches.</label></li>
+<li><label><input type="checkbox"></input><strong>Raw data is never
+modified.</strong> Source data is read-only; all transformations produce
+new files in separate locations.</label></li>
+<li><label><input type="checkbox"></input><strong>All figures and tables are
+generated automatically by code.</strong> No manual export; if something
+needs to change, it changes in the code.</label></li>
+<li><label><input type="checkbox"></input><strong>Results are exactly
+reproducible.</strong> Explicit seeds, no hidden environment state —
+running from a fresh session always works.</label></li>
+<li><label><input type="checkbox"></input><strong>Scripts are modular and run
+in sequence.</strong> The pipeline is broken into discrete numbered
+stages, each independently runnable.</label></li>
+<li><label><input type="checkbox"></input><strong>Intermediate outputs are
+saved.</strong> Each script writes its outputs to disk; downstream
+scripts load them rather than rerunning upstream steps.</label></li>
+<li><label><input type="checkbox"></input><strong>Each analytical step is done
+exactly once.</strong> Logic lives in one place; downstream steps
+consume outputs, not repeated code.</label></li>
+<li><label><input type="checkbox"></input><strong>Analytical decisions are
+documented.</strong> Comments explain <em>why</em> — non-obvious choices
+in cleaning, modeling, or interpretation are noted where they
+occur.</label></li>
+<li><label><input type="checkbox"></input><strong>The project is
+self-contained.</strong> Anyone who clones this repository can find the
+data or clear instructions for obtaining it.</label></li>
 </ul>
 <p>The full Principles section below explains the reasoning behind each
-item and what to build toward as projects grow in size, duration, and
-complexity.</p>
+item, gives implementation examples, and notes where 🟡 build-toward
+practices apply.</p>
 <hr />
 </div>
 <div id="principles" class="section level2">
@@ -536,7 +542,7 @@ critical for a first small project.</p>
 <p>When specific example implementations within a 🔴 principle require
 more setup or only pay off later, they are marked 🟡 individually.</p>
 <hr />
-<p>🔴 <strong>The project lives under version control.</strong> All
+<p>🟡 <strong>The project lives under version control.</strong> All
 code, configuration, and documentation is tracked in a repository,
 enabling collaboration, rollback, and a record of not just what changed
 but why.</p>
@@ -550,13 +556,21 @@ organization; start as private</li>
 rights</li>
 <li>Commit regularly with meaningful messages — not as a single
 end-of-project dump</li>
-<li>🟡 For manuscript submission, archive a permanent snapshot of the
-code (and data, if shareable) on <a href="https://osf.io">OSF</a>, <a href="https://zenodo.org">Zenodo</a>, or equivalent — many journals now
+<li>For manuscript submission, archive a permanent snapshot of the code
+(and data, if shareable) on <a href="https://osf.io">OSF</a>, <a href="https://zenodo.org">Zenodo</a>, or equivalent — many journals now
 require this, and a GitHub repository alone is not a permanent
 archive</li>
 <li>See the lab’s <a href="https://github.com/IrinaStatsLab/IrinaStatsLabResources">coding
 resources</a> for commit style conventions</li>
 </ul>
+</blockquote>
+<blockquote>
+<p>⏳ <em>Learning curve:</em> Version control pays off most when things
+go wrong — when you need to roll back a change, trace why a result
+changed, or collaborate without overwriting each other’s work. On a
+first solo project the cost of not using it may not be obvious, but the
+habit is much easier to build early than to adopt mid-project after
+something breaks.</p>
 </blockquote>
 <hr />
 <p>🔴 <strong>The project is self-contained.</strong> Everything needed
@@ -696,7 +710,7 @@ reading the code</li>
 </ul>
 </blockquote>
 <hr />
-<p>🔴 <strong>Naming is consistent and intentional.</strong> Files,
+<p>🟡 <strong>Naming is consistent and intentional.</strong> Files,
 functions, and variables follow a predictable convention; good names
 communicate purpose without requiring a comment.</p>
 <blockquote>
@@ -708,6 +722,13 @@ communicate purpose without requiring a comment.</p>
 <li>Function names are verbs: <code>compute_age_group()</code>; data
 objects are nouns: <code>patient_visits</code></li>
 </ul>
+</blockquote>
+<blockquote>
+<p>⏳ <em>Learning curve:</em> Poor naming rarely breaks an analysis
+immediately — it slows down everyone (including future you) who tries to
+read it. The numbered script convention is low effort and worth doing
+from the start; consistent <code>snake_case</code> and descriptive names
+matter more as scripts and functions multiply.</p>
 </blockquote>
 <hr />
 <p>🟡 <strong>Functions and scripts are separated.</strong> Reusable
@@ -735,7 +756,7 @@ once, the value is obvious. The habit is easier to build early than to
 retrofit later.</p>
 </blockquote>
 <hr />
-<p>🟡 <strong>Each analytical step is done exactly once.</strong> Every
+<p>🔴 <strong>Each analytical step is done exactly once.</strong> Every
 transformation or derivation happens in one place only; downstream
 scripts consume the output, they do not repeat the logic. Repeated code
 patterns belong in a function.</p>
@@ -748,13 +769,6 @@ scripts</li>
 <li>If the same plot type is produced for multiple variables, a single
 function in <code>R/</code> handles it</li>
 </ul>
-</blockquote>
-<blockquote>
-<p>⏳ <em>Learning curve:</em> Like functions/scripts separation, this
-becomes most visible when something needs to change — a recoding
-decision, a model specification — and you realize the logic has been
-copy-pasted into four different scripts. Fixing it once is easy; fixing
-it in four places consistently is error-prone.</p>
 </blockquote>
 <hr />
 <p>🔴 <strong>Scripts are modular and run in sequence.</strong> The
@@ -785,7 +799,7 @@ scripts in order</li>
 </ul>
 </blockquote>
 <hr />
-<p>🟡 <strong>Intermediate outputs are saved.</strong> Each stage writes
+<p>🔴 <strong>Intermediate outputs are saved.</strong> Each stage writes
 its outputs to disk; the next stage loads them. This avoids re-running
 expensive steps and makes each stage independently inspectable.</p>
 <blockquote>
@@ -800,12 +814,6 @@ expensive steps and makes each stage independently inspectable.</p>
 <li>If only figures need updating, the figures script reruns on its own
 — no data reprocessing needed</li>
 </ul>
-</blockquote>
-<blockquote>
-<p>⏳ <em>Learning curve:</em> The first time you wait 20 minutes for a
-simulation or model to rerun just to tweak a figure label, this
-principle becomes self-evident. For fast pipelines it adds little; for
-anything computationally expensive it is essential.</p>
 </blockquote>
 <hr />
 <p>🟡 <strong>Computation and presentation are separated.</strong> Heavy
